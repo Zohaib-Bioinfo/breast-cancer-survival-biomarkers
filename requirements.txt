@@ -1,0 +1,12 @@
+GEOparse>=2.0.4
+pandas>=2.0
+numpy>=2.0
+scikit-learn>=1.6
+xgboost>=3.0
+shap>=0.52
+lifelines>=0.27
+mygene>=3.2
+matplotlib>=3.10
+seaborn>=0.13
+scipy>=1.16
+requests>=2.32

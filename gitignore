@@ -1,0 +1,30 @@
+# Large data files — download manually from cBioPortal
+data_clinical_patient.txt
+data_clinical_sample.txt
+brca_metabric.tar.gz
+brca_metabric/
+metabric_data/
+
+# GEO data files
+*.soft.gz
+*.soft
+GSE*
+
+# Colab
+.config/
+sample_data/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
