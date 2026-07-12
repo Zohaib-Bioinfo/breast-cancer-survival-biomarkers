@@ -1,22 +1,35 @@
-# ML-Derived Biomarkers for Breast Cancer Survival Prognosis
+# Breast Cancer Survival Biomarkers — METABRIC Prognostic Validation
 
-Independent prognostic validation of machine learning–derived transcriptomic biomarkers in the METABRIC cohort, extending a GSE45827-trained XGBoost classifier to clinical survival outcomes.
+Prognostic validation of an ML-derived transcriptomic biomarker panel in the METABRIC cohort (n=1,608), testing whether genes identified via SHAP-guided XGBoost classification carry independent prognostic value beyond PAM50 molecular subtype and established clinical variables.
 
-## Overview
-
-Most published breast cancer subtype classifiers are evaluated purely on classification accuracy, with no test of whether the genes they identify actually predict clinical outcomes. This project addresses that gap by:
-
-1. Taking the 46 SHAP-selected biomarker genes from a GSE45827-trained XGBoost subtype classifier (see [breast-cancer-subtype-classification](https://github.com/Zohaib-Bioinfo/breast-cancer-subtype-classification))
-2. Validating their **independent prognostic value** in the METABRIC cohort (n=1,608) using multivariate Cox regression — adjusting for age, lymph node status, Nottingham Prognostic Index (NPI), and PAM50 molecular subtype
+> **Companion repository:** The biomarker panel validated here — along with subsequent pipeline robustness testing (classifier comparison, feature selection stability, external cohort classification validation, and extended pathway enrichment) — is documented in [breast-cancer-subtype-classification](https://github.com/Zohaib-Bioinfo/breast-cancer-subtype-classification). That repository establishes *how* the 46-gene panel was discovered and *why* it should be trusted; this repository establishes whether it carries genuine prognostic value.
 
 ## Key Findings
 
-- **CDCA5** (HR = 1.144, p = 0.023): Higher expression independently associated with worse overall survival
-- **CMC2** (HR = 0.919, p = 0.049): Higher expression independently associated with better overall survival
-- Adding 46 ML-derived biomarker genes to clinical variables improved concordance index from **0.657 → 0.679 (+0.022)**
-- CDCA5 high vs low expressers: Log-rank p = 1.69e-09 with sustained survival separation over 300 months
+- **CDCA5** (Cell Division Cycle Associated 5 / Sororin): HR=1.144, 95% CI 1.019-1.284, p=0.023
+- **CMC2** (COX Assembly Mitochondrial Protein 2): HR=0.919, 95% CI 0.845-1.000, p=0.049
+- Both findings confirmed in a proportional hazards-corrected sensitivity analysis (CDCA5: HR=1.123, p=0.049; CMC2: HR=0.916, p=0.039)
+- The 46-gene panel improved the concordance index from 0.657 (clinical-only) to 0.679
+- Neither gene survived Benjamini-Hochberg FDR correction across all 46 genes tested; both are reported as exploratory candidates
+- Companion pipeline robustness testing (see linked repository) shows CDCA5 supported by convergent evidence across four independent axes, while CMC2's supporting evidence is comparatively thinner — the two genes warrant differentiated confidence, not equal treatment
 
-## Dataset
+## Repository Structure
+
+```
+breast-cancer-survival-biomarkers/
+├── README.md
+├── notebooks/
+│   └── 01_metabric_survival_validation.ipynb   # Cox regression, KM curves, PH testing, sensitivity analysis, C-index
+├── data/
+│   ├──  metabric_survival_analysis.csv          # Processed METABRIC cohort (1,608 patients x 73 columns)
+|   └──  data_clinical_patient.txt
+|   └──  data_clinical_sample.txt
+├── results/                            # Cohort characteristics, Cox results, Schoenfeld PH test results
+├── figures/                            # Figs 1-4 as referenced in the manuscript
+                                  
+```
+
+## Data Availability
 
 | Dataset | Source | Samples | Use |
 |---|---|---|---|
@@ -46,6 +59,10 @@ Most published breast cancer subtype classifiers are evaluated purely on classif
 - **Concordance Index (C-index)** comparison between models
 - **CDCA5 stratified KM analysis**: median split, log-rank test
 
+## Methods Summary
+
+Clinical and expression data (46 biomarker gene z-scores, Illumina HT-12 v3) were retrieved from METABRIC via the cBioPortal REST API (study ID: `brca_metabric`). Analysis used the `lifelines` Python library: Kaplan-Meier estimation and multivariate log-rank testing for subtype-stratified survival, and L2-penalized multivariate Cox proportional hazards regression (two nested models: clinical-only baseline vs. clinical + 46-gene panel) adjusting for age at diagnosis, lymph node count, Nottingham Prognostic Index, and PAM50 subtype. The proportional hazards assumption was formally tested via Schoenfeld residuals (Grambsch-Therneau framework); seven covariates violated PH and were addressed in a pre-specified sensitivity analysis (stratification for clinical violators, exclusion for gene violators).
+
 ## Results
 
 ### Subtype Survival Separation
@@ -69,34 +86,6 @@ Both significant after adjusting for age, lymph nodes, NPI, and PAM50 subtype.
 | Clinical + ML genes | 0.6788 |
 | **Improvement** | **+0.0221** |
 
-## Figures
-
-| Figure | Description |
-|---|---|
-| `figures/KM_survival_by_subtype.png` | Kaplan-Meier overall survival by PAM50 subtype |
-| `figures/forest_plot_biomarkers.png` | Forest plot — Cox hazard ratios for all 46 biomarker genes |
-| `figures/KM_CDCA5_expression.png` | Survival by CDCA5 expression level (high vs low) |
-| `figures/cindex_comparison.png` | C-index improvement: clinical vs clinical + ML genes |
-
-## Repository Structure
-
-```
-breast-cancer-survival-biomarkers/
-├── README.md
-├── requirements.txt
-├── LICENSE
-├── .gitignore
-├── notebooks/
-│   └── PrognosticValidationMLBiomarkers.ipynb
-├── figures/
-│   ├── KM_survival_by_subtype.png
-│   ├── forest_plot_biomarkers.png
-│   ├── KM_CDCA5_expression.png
-│   └── cindex_comparison.png
-└── results/
-    └── metabric_survival_analysis.csv
-```
-
 ## Reproduction
 
 ```bash
@@ -109,20 +98,20 @@ Open `notebooks/PrognosticValidationMLBiomarkers.ipynb` in Google Colab or Jupyt
 
 **Data note:** Clinical data (`data_clinical_patient.txt`) must be downloaded manually from [cBioPortal METABRIC](https://www.cbioportal.org/study/summary?id=brca_metabric) due to file size. Gene expression values are retrieved automatically via the cBioPortal REST API in the notebook.
 
-## Related Project
-
-This project extends: [breast-cancer-subtype-classification](https://github.com/Zohaib-Bioinfo/breast-cancer-subtype-classification) — GSE45827 XGBoost classifier (94.6% CV accuracy) that generated the biomarker gene panel used here.
-
-## Tools & Technologies
-
-Python, lifelines, scikit-learn, XGBoost, SHAP, pandas, matplotlib, cBioPortal REST API, GEOparse, mygene
-
 ## Limitations
 
 - Cox model uses L2 penalization (penalizer=0.1) to handle 46 simultaneous gene predictors — results should be considered exploratory
 - Expression platforms differ between GSE45827 (Affymetrix microarray) and METABRIC (Illumina HT-12 microarray) — cross-platform normalization not applied
 - No experimental (wet-lab) validation of CDCA5 or CMC2 prognostic roles
 - Median split for CDCA5 KM analysis is a post-hoc visualization — not a pre-specified cutpoint
+
+## Reproducing This Work
+
+The notebook is self-contained and runs in Google Colab or any Python 3.12 environment with `lifelines`, `pandas`, `numpy`, `requests`, `matplotlib`, and `seaborn` installed. The processed METABRIC CSV in `data/` allows full reproduction without re-querying the cBioPortal API, though the notebook includes the original API retrieval code for transparency.
+
+## Citation
+
+If you use this analysis or its outputs, please cite the associated manuscript (full text and supporting information available in the [companion repository](https://github.com/Zohaib-Bioinfo/breast-cancer-subtype-classification)).
 
 ## Author
 
