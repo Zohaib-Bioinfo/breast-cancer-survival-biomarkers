@@ -1,0 +1,5 @@
+SUBTYPE,n,death_events,median_os_months,median_age,median_npi,lymph_node_positive_pct,death_event_pct
+Basal,209,115,85.5,54.22,5.02,51.2,55.0
+Her2,224,157,97.07,59.06,4.08,56.25,70.1
+Luminal A,700,378,130.08,63.37,3.08,41.0,54.0
+Luminal B,475,315,104.1,66.52,4.05,49.89,66.3
