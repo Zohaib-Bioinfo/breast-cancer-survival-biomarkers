@@ -1,11 +1,13 @@
-# Large data files — download manually from cBioPortal
+# Large raw clinical files — download manually from cBioPortal
+# (metabric_survival_analysis.csv in data/ is the processed, tracked
+# alternative that makes these unnecessary for reproducing the manuscript)
 data_clinical_patient.txt
 data_clinical_sample.txt
 brca_metabric.tar.gz
 brca_metabric/
 metabric_data/
 
-# GEO data files
+# GEO data files (only relevant if Phase 1 discovery is rerun from this repo)
 *.soft.gz
 *.soft
 GSE*
@@ -13,6 +15,9 @@ GSE*
 # Colab
 .config/
 sample_data/
+
+# Kaggle
+.kaggle/
 
 # Python
 __pycache__/
