@@ -1,12 +1,24 @@
-GEOparse>=2.0.4
+# Core data acquisition and processing
 pandas>=2.0
 numpy>=2.0
-scikit-learn>=1.6
-xgboost>=3.0
-shap>=0.52
+scipy>=1.16
+requests>=2.32          # cBioPortal REST API calls
+
+# Survival analysis
 lifelines>=0.27
-mygene>=3.2
+
+# Visualization
 matplotlib>=3.10
 seaborn>=0.13
-scipy>=1.16
-requests>=2.32
+
+# ---------------------------------------------------------------------------
+# The following are only needed if you plan to rerun the upstream discovery
+# step (Phase 1) from within this repo rather than using the pre-processed
+# metabric_survival_analysis.csv already provided in data/. For a standard
+# survival-analysis-only run, these can be omitted.
+# ---------------------------------------------------------------------------
+# GEOparse>=2.0.4
+# scikit-learn>=1.6
+# xgboost>=3.0
+# shap>=0.52
+# mygene>=3.2
